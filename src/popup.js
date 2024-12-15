@@ -110,3 +110,36 @@ import './popup.css';
     }
   );
 })();
+
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.action === "contentDragged") {
+    displayContent(request.content);
+  }
+});
+
+function displayContent(content) {
+  let contentDiv = document.getElementById('content');
+  let html = '';
+  
+  if (content.text) {
+    html += `<p>${content.text}</p>`;
+  }
+  if (content.href) {
+    html += `<a href="${content.href}">${content.href}</a>`;
+  }
+  if (content.src) {
+    html += `<img src="${content.src}" style="max-width:100%;">`;
+  }
+  
+  contentDiv.innerHTML = html;
+}
+
+// 팝업이 열릴 때 저장된 콘텐츠 표시
+document.addEventListener('DOMContentLoaded', function() {
+  chrome.storage.local.get(['savedContent'], function(result) {
+    if (result.savedContent) {
+      displayContent(result.savedContent);
+    }
+  });
+});
